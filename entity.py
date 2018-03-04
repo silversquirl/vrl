@@ -7,10 +7,11 @@ class Entity:
   HITMSG = "Something took {damage} damage."
   DIEMSG = "Something died."
 
-  def __init__(self, pos, m, ch):
+  def __init__(self, pos, m, ch, colour=0xFFFFFF):
     self.pos = np.array(pos)
     self.m = m
     self.ch = ch
+    self.colour = colour
     self.aq = deque() # Action queue
 
     # Stats
@@ -44,8 +45,8 @@ class Entity:
     self.pos = pos
     return True, pos
 
-  def draw(self, c):
-    c.draw_char(self.x, self.y, self.ch, fg=0xFFFFFF)
+  def draw(self, g):
+    g.putc(self.pos, self.ch, fg=self.colour)
 
   def action(self, action, *args):
     "Push an Action to the action queue"

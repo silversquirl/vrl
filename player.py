@@ -1,5 +1,5 @@
 from entity import Entity
-from dijkstra import *
+import dijkstra
 
 class Player(Entity):
   HITMSG = "The monster hits you. You take {damage} damage."
@@ -7,8 +7,9 @@ class Player(Entity):
 
   def __init__(self, pos, m):
     super(Player, self).__init__(pos, m, '@')
-    self.seek_map = init_dijkstra(self.m.shape)
+    self.seek_map = dijkstra.init(self.m.shape)
     self.recalculate_dijkstra()
+    self.light_radius = 5
 
     # Stats
     self.hp = 10
@@ -16,12 +17,13 @@ class Player(Entity):
     self.defence = 2
 
   def recalculate_dijkstra(self):
-    clear_dijkstra(self.seek_map, (self.pos,))
-    calculate_dijkstra(self.seek_map, self.m)
+    dijkstra.clear(self.seek_map, (self.pos,))
+    dijkstra.calculate(self.seek_map, self.m.walkable_points)
 
   def move(self, v):
     ret = super(Player, self).move(v)
-    self.recalculate_dijkstra()
+    if ret:
+      self.recalculate_dijkstra()
     return ret
 
   def die(self):

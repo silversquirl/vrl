@@ -2,3 +2,8 @@
 *.so
 build/
 __pycache__/
+
+# Profiling and benchmarking
+profile_*.py
+bench_*.py
+Profile.prof
