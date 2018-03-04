@@ -9,7 +9,7 @@ class Player(Entity):
     super(Player, self).__init__(pos, m, '@')
     self.seek_map = dijkstra.init(self.m.shape)
     self.recalculate_dijkstra()
-    self.light_radius = 5
+    self.light_radius = 4
 
     # Stats
     self.hp = 10

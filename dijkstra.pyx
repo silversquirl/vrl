@@ -40,12 +40,20 @@ def clear(np.int_t[:,:] d, targets=()):
 def init(np.int_t[:] shape):
   return np.empty(shape, int)
 
-def draw_light(np.ndarray[np.int_t, ndim=2] d, g, int radius):
+cdef inline unsigned char point_brightness(np.int_t[:,:] d, Py_ssize_t[:] shape, int radius, unsigned char v, int x, int y):
+  cdef np.int_t n = d[y,x]
+  if n > radius:
+    n = min_neighbour(d, shape, x, y) + 1
+    if n > radius: return 0
+  return 255 - v * n
+
+def draw_light(np.int_t[:,:] d, g, int radius):
   cdef unsigned char b, v = 255 / (radius + 1)
-  for p, x in np.ndenumerate(d):
-    if x > radius: b = 0
-    else: b = 255 - v * x
-    g.setcolour(p, (b, b, b))
+  cdef Py_ssize_t[:] shape = d.shape
+  for y in range(shape[0]):
+    for x in range(shape[1]):
+      b = point_brightness(d, shape, radius, v, x, y)
+      g.setcolour((y, x), (b, b, b))
 
 # For debugging
 def draw_map(np.ndarray[np.int_t, ndim=2] d, g):
