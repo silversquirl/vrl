@@ -26,6 +26,30 @@ def calculate(np.int_t[:,:] d, np.int_t[:,:] wp):
         d[y,x] = new
         changed = True
 
+import random
+def roll_downhill(np.int_t[:,:] d, int sx, int sy):
+  cdef list pts = []
+  cdef Py_ssize_t[:] shape = d.shape
+  cdef int v = shape[0] * shape[1] + 2
+  cdef int y, x, dy, dx
+
+  cdef bint changed = False
+  for dy in range(-1, 2):
+    for dx in range(-1, 2):
+      y = sy + dy
+      x = sx + dx
+
+      if 0 <= y < shape[0] and 0 <= x < shape[1]:
+        if d[y,x] < v:
+          v = d[y,x]
+          pts = [(dy, dx)]
+        elif d[y,x] == v:
+          pts.append((dy, dx))
+
+  if len(pts) == 0:
+    raise ValueError("No valid neighbours for point (%d, %d)" % (sx, sy))
+  return random.choice(pts)
+
 def clear(np.int_t[:,:] d, targets=()):
   cdef int v
   cdef size_t x, y

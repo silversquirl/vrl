@@ -11,14 +11,14 @@ LEVEL = """
 #######......######
 #........@........#       ########
 #.#####......####.#       #......#
-#.#   #......#  #.#       #......#
+#.#   #......#  #.#       #.!....#
 #.#   ########  #.#       #......#
 #.########      #.#       ###.####
 #.##.....########.###########.######
-#.##.....##........................#
+#.##...!.##........................#
 #.##.....##.###.##################.#
 #.####.####.# #.#       #######  #.#
-#...........# #.#       #.....####.#
+#...........# #.#       #.!...####.#
 ############# #.#       #..........#
               #.#       #.....######
               #.###########.###
@@ -33,7 +33,7 @@ LEVEL = """
         #.............#
         #.............#
         #.............#
-        #.............#
+        #...!.........#
         #.............#
         #.............#
         ###############
@@ -44,13 +44,14 @@ def const(v=None): return lambda *_: v
 class Game:
   def __init__(self):
     self.m = Map(LEVEL)
+    self.messages = []
 
     self.monsters = []
     for p, ch in self.m.special:
       if ch == '@':
-        self.player = Player(p, self.m)
+        self.player = Player(p, self)
       elif ch == '!':
-        self.monsters.append(Monster(p, self.m))
+        self.monsters.append(Monster(p, self))
 
     self.m.entities.append(self.player)
     self.m.entities.extend(self.monsters)
@@ -95,9 +96,14 @@ class Game:
         if self.key_down(k):
           return True
 
+  def have_turn(self):
+    for m in self.monsters:
+      m.have_turn()
+
   def run(self):
     self.draw()
     while self.handle_events():
+      self.have_turn()
       self.draw()
 
   def quit(self):
@@ -109,19 +115,21 @@ class Game:
     return self.KEYS.get(k.key, const())(self)
 
   def move(v, self):
-    return self.player.move_or_attack(v)
+    return self.player.move(v)
 
   KEYS = {
     "ESCAPE": quit,
     "q": quit,
 
-    "h": partial(move, (-1, 0)),
-    "j": partial(move, (0, 1)),
-    "k": partial(move, (0, -1)),
-    "l": partial(move, (1, 0)),
+    ".": const(True),
+
+    "h": partial(move, (0, -1)),
+    "j": partial(move, (1, 0)),
+    "k": partial(move, (-1, 0)),
+    "l": partial(move, (0, 1)),
     "y": partial(move, (-1, -1)),
-    "u": partial(move, (1, -1)),
-    "b": partial(move, (-1, 1)),
+    "u": partial(move, (-1, 1)),
+    "b": partial(move, (1, -1)),
     "n": partial(move, (1, 1)),
   }
 

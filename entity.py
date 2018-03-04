@@ -5,9 +5,10 @@ class Entity:
   HITMSG = "Something took {damage} damage."
   DIEMSG = "Something died."
 
-  def __init__(self, pos, m, ch, colour=0xFFFFFF):
+  def __init__(self, pos, game, ch, colour=0xFFFFFF):
     self.pos = np.array(pos)
-    self.m = m
+    self.m = game.m
+    self.g = game
     self.ch = ch
     self.colour = colour
 
@@ -22,32 +23,27 @@ class Entity:
   def y(self): return self.pos[0]
 
   def die(self):
-    self.m.messages.append(self.DIEMSG)
+    self.g.messages.append(self.DIEMSG)
 
   def hit(self, attacker):
     damage = attacker.attack // max(self.defence, 1)
     self.hp -= damage
-    self.m.messages.append(self.HITMSG.format(damage=damage))
+    self.g.messages.append(self.HITMSG.format(damage=damage))
     if self.hp <= 0:
       self.die()
     return damage
 
-  def move(self, v):
-    v = np.clip(np.array(v)[::-1], -1, 1)
+  def move(self, v, attack=True):
+    "Move the entity in the direction of the row-major vector v"
+    v = np.clip(v, -1, 1)
     pos = (self.pos + v)
     if not in_bounds(pos, self.m.shape):
-      return False, None
+      return False
+    # TODO: implement entity detection and attacking
     if not self.m.walkable[tuple(pos)]:
-      return False, pos
+      return False
     self.pos = pos
-    return True, pos
-
-  def move_or_attack(self, v):
-    succ, pos = self.move(v)
-    if succ:
-      return True
-    # TODO: Implement attacking
-    return False
+    return True
 
   def draw(self, g):
     g.putc(self.pos, self.ch, fg=self.colour)
