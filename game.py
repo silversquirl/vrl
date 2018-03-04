@@ -91,7 +91,7 @@ class Game:
   def handle_events(self):
     while not (tcod.console.is_window_closed() or self.finish):
       k = tcod.console.wait_for_keypress(True)
-      if k['pressed']:
+      if k.pressed:
         if self.key_down(k):
           return True
 
@@ -105,13 +105,14 @@ class Game:
     return True
 
   def key_down(self, k):
-    return self.KEYS.get(chr(k['c']), const())(self)
+    if k.text: return # I don't know how to handle text events yet
+    return self.KEYS.get(k.key, const())(self)
 
   def move(v, self):
     return self.player.move_or_attack(v)
 
   KEYS = {
-    #"ESCAPE": quit, # FIXME: not currently working. This is an issue with my libTCOD wrapper
+    "ESCAPE": quit,
     "q": quit,
 
     "h": partial(move, (-1, 0)),
