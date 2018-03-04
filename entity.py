@@ -1,6 +1,4 @@
 import numpy as np
-from collections import deque
-from action import *
 from util import in_bounds
 
 class Entity:
@@ -12,7 +10,6 @@ class Entity:
     self.m = m
     self.ch = ch
     self.colour = colour
-    self.aq = deque() # Action queue
 
     # Stats
     self.hp = 1
@@ -45,22 +42,12 @@ class Entity:
     self.pos = pos
     return True, pos
 
+  def move_or_attack(self, v):
+    succ, pos = self.move(v)
+    if succ:
+      return True
+    # TODO: Implement attacking
+    return False
+
   def draw(self, g):
     g.putc(self.pos, self.ch, fg=self.colour)
-
-  def action(self, action, *args):
-    "Push an Action to the action queue"
-    if isinstance(action, str):
-      action = {
-        "move_attack": MoveOrAttackAction,
-      }[action.lower()](*args)
-    self.aq.append(action)
-
-  def pop_apply_action(self):
-    "Pop and apply an action from the action queue"
-    if len(self.aq) == 0:
-      return False
-    return self.aq.popleft().apply(self)
-
-  def have_turn(self):
-    return self.pop_apply_action()

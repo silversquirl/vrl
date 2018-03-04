@@ -87,31 +87,26 @@ class Game:
     tcod.console.flush()
 
   def handle_events(self):
-    while True:
+    while not (tcod.console.is_window_closed() or self.finish):
       k = tcod.console.wait_for_keypress(True)
       if k['pressed']:
-        self.key_down(k)
-        break
-
-  def have_turn(self):
-    if not self.player.have_turn(): return
-    for monster in self.monsters:
-      monster.have_turn()
+        if self.key_down(k):
+          return True
 
   def run(self):
-    while not (tcod.console.is_window_closed() or self.finish):
+    self.draw()
+    while self.handle_events():
       self.draw()
-      self.handle_events()
-      self.have_turn()
 
   def quit(self):
     self.finish = True
+    return True
 
   def key_down(self, k):
     return self.KEYS.get(chr(k['c']), const())(self)
 
   def move(v, self):
-    self.player.action("move_attack", v)
+    return self.player.move_or_attack(v)
 
   KEYS = {
     #"ESCAPE": quit, # FIXME: not currently working. This is an issue with my libTCOD wrapper
