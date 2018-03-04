@@ -2,8 +2,8 @@ import numpy as np
 from util import in_bounds
 
 class Entity:
-  HITMSG = "Something took {damage} damage."
-  DIEMSG = "Something died."
+  HITMSG = "Something takes {damage} damage."
+  DIEMSG = "Something dies."
 
   def __init__(self, pos, game, ch, colour=0xFFFFFF):
     self.pos = np.array(pos)
@@ -37,11 +37,17 @@ class Entity:
     "Move the entity in the direction of the row-major vector v"
     v = np.clip(v, -1, 1)
     pos = (self.pos + v)
+
     if not in_bounds(pos, self.m.shape):
       return False
-    # TODO: implement entity detection and attacking
     if not self.m.walkable[tuple(pos)]:
       return False
+
+    target = self.m.collide(pos)
+    if target:
+      target.hit(self)
+      return True
+
     self.pos = pos
     return True
 

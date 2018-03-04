@@ -15,6 +15,7 @@ class Monster(Entity):
   def die(self):
     super(Monster, self).die()
     self.g.monsters.remove(self)
+    self.m.entities.remove(self)
 
   def have_turn(self):
     seek = self.g.player.seek_map

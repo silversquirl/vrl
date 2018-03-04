@@ -29,6 +29,12 @@ class Map:
   @property
   def height(self): return self.shape[0]
 
+  def collide(self, pos):
+    for e in self.entities:
+      if np.all(e.pos == pos):
+        return e
+    return False
+
   def draw(self, g):
     for p, ch in np.ndenumerate(self.chars):
       g[p] = ch

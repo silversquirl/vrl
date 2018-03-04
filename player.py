@@ -28,4 +28,4 @@ class Player(Entity):
 
   def die(self):
     super(Player, self).die()
-    self.level.end()
+    self.g.quit()

@@ -83,6 +83,9 @@ class Game:
     if bg: tcod.console.set_background(self.c, x, y, bg)
 
   def draw(self):
+    while self.messages:
+      print(self.messages.pop(0))
+
     tcod.console.clear(self.c)
     self.m.draw(self)
     dijkstra.draw_light(self.player.seek_map, self, self.player.light_radius)
